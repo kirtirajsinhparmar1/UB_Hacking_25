@@ -874,7 +874,7 @@ if st.session_state.screening_result:
     st.markdown('<div class="section-spacing"></div>', unsafe_allow_html=True)
     
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Risk Breakdown", "Alerts", "Analytics", "Export"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Risk Breakdown", "Alerts", "All Articles", "Analytics", "Export"])
     
     with tab1:
         risk_scores = result.get("risk_scores", {})
@@ -956,6 +956,99 @@ if st.session_state.screening_result:
             st.success("No high-risk articles detected.")
     
     with tab3:
+        all_assessments = result.get("all_assessments", [])
+        if all_assessments:
+            # Sort all articles by severity (high to low)
+            sorted_articles = sorted(all_assessments, key=lambda x: x.get("overall_severity", 0), reverse=True)
+            
+            st.markdown(f"### All Screened Articles ({len(sorted_articles)})")
+            st.markdown('<p style="color:var(--slate-400); font-size:0.875rem; margin-bottom:1.5rem;">Complete analysis of all articles sorted by severity score</p>', unsafe_allow_html=True)
+            
+            # Add filter options
+            filter_col1, filter_col2 = st.columns([2, 1])
+            with filter_col1:
+                severity_filter = st.select_slider(
+                    "Filter by minimum severity",
+                    options=[0, 10, 20, 30, 40, 50, 60, 70, 80, 90],
+                    value=0,
+                    key="severity_filter"
+                )
+            with filter_col2:
+                show_count = st.selectbox(
+                    "Articles to display",
+                    options=[10, 25, 50, 100, "All"],
+                    index=1,
+                    key="show_count"
+                )
+            
+            # Filter articles
+            filtered_articles = [a for a in sorted_articles if a.get("overall_severity", 0) >= severity_filter]
+            
+            # Limit display count
+            if show_count != "All":
+                filtered_articles = filtered_articles[:show_count]
+            
+            st.markdown(f'<p style="color:var(--slate-500); font-size:0.8125rem; margin:1rem 0;">Showing {len(filtered_articles)} of {len(sorted_articles)} articles</p>', unsafe_allow_html=True)
+            
+            # Display articles
+            for idx, art in enumerate(filtered_articles, 1):
+                sev = art.get("overall_severity", 0)
+                title = art.get("article_title", "Untitled")
+                
+                # Severity color coding
+                if sev > 60:
+                    sev_color = "#ef4444"
+                    sev_label = "HIGH"
+                elif sev > 30:
+                    sev_color = "#f59e0b"
+                    sev_label = "MEDIUM"
+                else:
+                    sev_color = "#10b981"
+                    sev_label = "LOW"
+                
+                with st.expander(f"#{idx} • Severity {sev}/100 • {title[:100]}{'...' if len(title) > 100 else ''}"):
+                    # Header info
+                    info_col1, info_col2, info_col3 = st.columns(3)
+                    with info_col1:
+                        st.markdown(f"**Source:** {art.get('source', 'Unknown')}")
+                        st.markdown(f"**Date:** {art.get('publish_date', '')[:10]}")
+                    with info_col2:
+                        st.markdown(f"**Primary Risk:** {art.get('primary_risk', 'N/A').replace('_', ' ').title()}")
+                        st.markdown(f"**Risk Level:** <span style='color:{sev_color}; font-weight:700;'>{sev_label}</span>", unsafe_allow_html=True)
+                    with info_col3:
+                        # Risk scores mini-breakdown
+                        risk_scores_art = art.get("risk_scores", {})
+                        if risk_scores_art:
+                            st.markdown("**Top Risks:**")
+                            top_risks = sorted(risk_scores_art.items(), key=lambda x: x[1], reverse=True)[:3]
+                            for risk_cat, risk_val in top_risks:
+                                st.markdown(f"• {risk_cat.replace('_', ' ').title()}: {risk_val}")
+                    
+                    st.markdown("---")
+                    
+                    # Key evidence
+                    st.markdown("**Key Evidence:**")
+                    key_sents = art.get("key_sentences", [])
+                    if key_sents:
+                        for sent in key_sents[:3]:
+                            if isinstance(sent, dict):
+                                st.markdown(f"- {sent.get('sentence', '')}")
+                            else:
+                                st.markdown(f"- {sent}")
+                    else:
+                        st.markdown("*No key sentences extracted*")
+                    
+                    # Explanation
+                    if art.get("explanation"):
+                        st.info(art.get("explanation"))
+                    
+                    # Link to article
+                    if art.get("article_url"):
+                        st.markdown(f"[📰 View Full Article]({art.get('article_url')})")
+        else:
+            st.info("No articles available for display.")
+    
+    with tab4:
         col1, col2 = st.columns(2)
         
         with col1:
@@ -987,7 +1080,7 @@ if st.session_state.screening_result:
             )
             st.plotly_chart(fig_hist, use_container_width=True)
     
-    with tab4:
+    with tab5:
         col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
             json_data = json.dumps(result, indent=2)
