@@ -1,6 +1,6 @@
 # The Inspiration
 
-Adverse media screening is a slow, manual compliance task. Analysts spend 2–4 hours per entity reading hundreds of articles—costly and error-prone at scale. I built Sentinel AI to automate this end-to-end, cutting screening time from hours to minutes while preserving bank-grade accuracy.
+Adverse media screening is a slow, manual compliance task. Analysts spend 2–4 hours per entity reading hundreds of articles—costly and error-prone at scale. I built RiskRadar AI to automate this end-to-end, cutting screening time from hours to minutes while preserving bank-grade accuracy.
 
 ---
 
@@ -59,7 +59,7 @@ Prototype → test → surface calibration issues → rewrite prompts/rubrics �
 
 ---
 
-# What’s Next for Sentinel AI
+# What’s Next for RiskRadar AI
 
 * **Expand data sources:** Add NewsAPI, Finnhub, SEC filings, court documents, non-English and historical coverage.
 * **Improve accuracy:** Ensemble GPT-4/Claude/Gemini; fine-tune on real screening data to match compliance priorities.
@@ -71,4 +71,4 @@ Prototype → test → surface calibration issues → rewrite prompts/rubrics �
 
 ---
 
-*Bottom line: Sentinel AI turns a manual compliance burden into fast, explainable, cost-effective automation—without sacrificing accuracy.*
+*Bottom line: RiskRadar AI turns a manual compliance burden into fast, explainable, cost-effective automation—without sacrificing accuracy.*
