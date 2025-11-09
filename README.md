@@ -1,41 +1,74 @@
-# 🛡️ Sentinel AI - Adverse Media Screening Platform
+# The Inspiration
 
-**Enterprise-grade AI-powered adverse media screening for banking compliance**
-
-Built for Buffalo Hackathon 2025  
-**Sponsors**: M&T Bank • Valmar Holdings • Odoo • Radial Ventures • TechBuffalo
+Adverse media screening is a slow, manual compliance task. Analysts spend 2–4 hours per entity reading hundreds of articles—costly and error-prone at scale. I built Sentinel AI to automate this end-to-end, cutting screening time from hours to minutes while preserving bank-grade accuracy.
 
 ---
 
-## 🎯 Problem
+# What I Learned
 
-Banks are legally required to conduct adverse media screening—monitoring negative news about customers, counterparties, and portfolio companies. Current manual processes are:
-
-- ❌ **95% manual**: Compliance analysts Google names and read hundreds of articles
-- ❌ **Expensive**: $150-400 per screening with analyst salaries
-- ❌ **Slow**: Takes 2-4 hours per entity, delaying approvals
-- ❌ **Inconsistent**: Different analysts flag different risks
-
-**Consequences**: Danske Bank ($236B money laundering), Rabobank ($360M fine)
+* Prompt calibration matters. Early prompts biased toward negative news and inflated scores by 30–40 points; stricter rubrics and conservative phrasing fixed this.
+* Structured outputs (Instructor + Pydantic) removed brittle JSON parsing and crashes.
+* UI quality affects trust; CSS, Plotly, and clean layout improved perceived reliability.
+* OpenRouter’s multi-model setup kept costs low (~$2 for the hackathon) and avoided lock-in.
+* Human oversight is essential; Fortune 500 “background noise” needs dampening and reality checks.
 
 ---
 
-## 💡 Solution
+# How I Built It 
 
-**Sentinel AI** automates adverse media screening using:
-
-1. **Real-time news aggregation** via Google News RSS (100% FREE)
-2. **AI risk classification** into 7 bank-grade categories via OpenRouter
-3. **Explainable AI** with sentence-level evidence and natural language rationales
-4. **Automated workflows** for M&T Bank, Valmar Holdings, Odoo
+* **News aggregation** — `src/utils/news_fetcher.py`
+  Google News RSS (free), caching, balanced retrieval (positive/neutral/negative), 10–100 articles per screening.
+* **AI screening** — `src/models/screener.py`
+  OpenRouter to GPT/Claude/Gemini; Instructor + Pydantic schemas; 7 risk categories; sentence-level evidence with importance; clear rationales.
+* **Dashboard** — `app.py`
+  Streamlit, custom CSS, Plotly visuals; tabs (Analysis / Articles / Trends / Export); CSV/JSON export.
 
 ---
 
-## 🚀 Quick Start
+# Calibration & Guardrails 
 
-### Prerequisites
-- Python 3.9+
-- OpenRouter API key (FREE): https://openrouter.ai/settings/keys
+1. Removed negative-only filters → pull full-spectrum news.
+2. Strict scoring rubric → routine lawsuits score 10–20, not 70+.
+3. Enterprise dampening → −25% for mega-caps unless evidence is exceptional (≥95).
+4. Lower temperature → 0.2 for consistency.
+   *Result: Bank of America ~35–45/100; Tesla ~25–35/100.*
 
-### Installation
+---
 
+# Development Process 
+
+Prototype → test → surface calibration issues → rewrite prompts/rubrics → add caching & exports → refine UI/UX → finalize analytics and evidence views.
+
+---
+
+# Key Challenges
+
+* Model availability/name churn on free tiers → standardized on `gpt-3.5-turbo`.
+* Production-ready UI took real design work (layout, typography, charts).
+* Time pressure forced prioritization of core value first.
+
+---
+
+# Why It’s Special
+
+* Real business value and immediate ROI on a high-cost manual process.
+* Explainable by design: each score cites sentence-level evidence suitable for audits.
+* Low operating cost: free RSS + inexpensive LLM calls.
+* Deployable polish: stable code, caching, exports, professional dashboard.
+* Buffalo Proud: showcases UB talent building credible, production-ready fintech.
+
+---
+
+# What’s Next for Sentinel AI
+
+* **Expand data sources:** Add NewsAPI, Finnhub, SEC filings, court documents, non-English and historical coverage.
+* **Improve accuracy:** Ensemble GPT-4/Claude/Gemini; fine-tune on real screening data to match compliance priorities.
+* **Integrations:** REST API for M&T’s LOS, webhooks for Valmar’s Totality LMS, Odoo plugin for partner screening.
+* **Continuous monitoring:** Automatic re-screening every 24 hours with spike alerts.
+* **Performance:** Parallelize processing, smarter caching, batch LLM calls; support overnight batch screenings.
+* **Audit features:** PDF reports with citations, history logs, configurable thresholds, RBAC.
+* **User testing:** Put in front of compliance officers; iterate on workflow needs.
+
+---
+
+*Bottom line: Sentinel AI turns a manual compliance burden into fast, explainable, cost-effective automation—without sacrificing accuracy.*
