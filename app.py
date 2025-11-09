@@ -20,6 +20,97 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 from utils.news_fetcher import NewsFetcher
 from models.screener import AdverseMediaScreener
 
+import os
+from dotenv import load_dotenv
+import streamlit as st
+
+load_dotenv()
+
+def check_password():
+    """Professional authentication with RiskRadar AI theme"""
+    
+    def password_entered():
+        if st.session_state["password"] == os.getenv("APP_PASSWORD", "demo123"):
+            st.session_state["authenticated"] = True
+            st.session_state["login_error"] = False
+        else:
+            st.session_state["authenticated"] = False
+            st.session_state["login_error"] = True
+    
+    if "authenticated" not in st.session_state:
+        st.session_state["authenticated"] = False
+    
+    if "login_error" not in st.session_state:
+        st.session_state["login_error"] = False
+    
+    if not st.session_state["authenticated"]:
+        # Custom CSS matching RiskRadar AI theme
+        st.markdown("""
+        <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            .stDeployButton {display: none;}
+            
+            .stApp {
+                background: linear-gradient(180deg, #0a1628 0%, #1a2332 100%);
+            }
+            
+            .block-container {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            
+            .stTextInput > label {
+                color: #e2e8f0 !important;
+                font-weight: 500;
+                font-size: 0.95rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .stTextInput > div > div > input {
+                background: rgba(15, 23, 42, 0.5) !important;
+                border: 1px solid rgba(148, 163, 184, 0.2) !important;
+                border-radius: 8px;
+                padding: 0.9rem 1rem;
+                font-size: 1rem;
+                color: #ffffff !important;
+                transition: all 0.3s ease;
+            }
+            
+            .stTextInput > div > div > input:focus {
+                border-color: #2dd4bf !important;
+                box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.1) !important;
+                background: rgba(15, 23, 42, 0.7) !important;
+            }
+            
+            .stTextInput > div > div > input::placeholder {
+                color: #64748b;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("<div style='margin-top: 4vh;'></div>", unsafe_allow_html=True)
+        
+        st.markdown("""<div style="max-width: 520px; margin: 0 auto; background: rgba(26, 35, 50, 0.6); border: 1px solid rgba(45, 212, 191, 0.1); padding: 3rem 2.5rem; border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); backdrop-filter: blur(10px);"><div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2.5rem;"><div style="width: 64px; height: 64px; background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 2.2rem; box-shadow: 0 4px 16px rgba(45, 212, 191, 0.3); flex-shrink: 0;">🛡️</div><div><h1 style="font-size: 2.2rem; font-weight: 700; color: #ffffff; margin: 0; letter-spacing: -0.5px;">RiskRadar AI</h1><p style="color: #94a3b8; font-size: 0.95rem; margin: 0.25rem 0 0 0; font-weight: 400;">Enterprise Risk Intelligence</p></div></div><div style="text-align: center; margin-bottom: 2rem;"><h2 style="font-size: 1.75rem; font-weight: 600; color: #ffffff; margin-bottom: 0.5rem;">Adverse Media <span style="color: #2dd4bf;">Screening</span></h2><p style="color: #94a3b8; font-size: 0.95rem; line-height: 1.6; max-width: 440px; margin: 0 auto;">AI-powered risk intelligence for compliance and regulatory teams. Analyze entities in real-time with bank-grade accuracy.</p></div>""", unsafe_allow_html=True)
+        
+        if st.session_state.get("login_error", False):
+            st.markdown("""<div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.25rem; color: #fca5a5; font-weight: 500; font-size: 0.9rem;">⚠️ Invalid password. Please try again.</div>""", unsafe_allow_html=True)
+        
+        st.text_input("Password", type="password", on_change=password_entered, key="password", placeholder="Enter your password")
+        
+        st.markdown("""<div style="background: rgba(45, 212, 191, 0.08); border-left: 3px solid #2dd4bf; padding: 1rem 1.25rem; border-radius: 8px; margin-top: 1.5rem;"><div style="font-weight: 600; color: #2dd4bf; margin-bottom: 0.4rem; font-size: 0.9rem;">🔑 Demo Access</div><p style="color: #cbd5e1; margin: 0; font-size: 0.9rem;">Use password: <code style="background: rgba(45, 212, 191, 0.15); padding: 3px 10px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9rem; color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.2);">demo123</code> to access the platform</p></div><div style="text-align: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(148, 163, 184, 0.1);"><div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: #94a3b8; font-size: 0.85rem; margin-bottom: 0.75rem;"><span style="color: #2dd4bf; font-weight: bold;">✓</span><span>Secured with enterprise-grade encryption</span></div><p style="color: #64748b; font-size: 0.85rem; margin-top: 0.75rem;">Need help? <a href="#" style="color: #2dd4bf; text-decoration: none; font-weight: 600;">Contact Support</a></p></div></div>""", unsafe_allow_html=True)
+        
+        return False
+    
+    return True
+
+# Add at start of main code
+if not check_password():
+    st.stop()
+# Rest of your app continues...
+
+
 
 # -----------------------
 # Professional Dark Theme CSS
